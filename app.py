@@ -15,7 +15,7 @@ from utils.roadmap import (
 )
 
 
-st.set_page_config(page_title="CareerCompass AI", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="CareerCompass AI", page_icon=None, layout="wide")
 
 
 EDUCATION_OPTIONS = ["High School", "Diploma", "Undergraduate", "Graduate", "Postgraduate", "Self-taught", "Other"]
@@ -61,7 +61,6 @@ def init_state() -> None:
     for key, value in DEFAULT_PROFILE.items():
         st.session_state.setdefault(key, value)
     st.session_state.setdefault("analysis_result", None)
-    st.session_state.setdefault("balloons_key", None)
 
 
 def inject_css() -> None:
@@ -69,61 +68,92 @@ def inject_css() -> None:
         """
         <style>
         :root {
-            --bg: #101318;
-            --panel: #171c24;
-            --panel-2: #202734;
-            --ink: #f3f7fb;
-            --muted: #a8b3c2;
-            --cyan: #67e8f9;
-            --green: #86efac;
-            --orange: #fdba74;
-            --rose: #fda4af;
-            --violet: #c4b5fd;
-            --line: rgba(255,255,255,.11);
+            --bg: #111417;
+            --panel: #191e23;
+            --panel-2: #20262d;
+            --ink: #f5f0e8;
+            --muted: #aeb8bd;
+            --accent: #d8b46a;
+            --accent-2: #8fb8a8;
+            --green: #8fb8a8;
+            --orange: #d39b61;
+            --violet: #b5a0d8;
+            --line: rgba(245,240,232,.13);
+            --line-strong: rgba(216,180,106,.42);
         }
-        .block-container { padding-top: 2rem; max-width: 1280px; }
+        .stApp { background: var(--bg); }
+        .block-container { padding-top: 2rem; max-width: 1240px; }
         .hero {
+            position: relative;
             border: 1px solid var(--line);
+            border-top: 3px solid var(--accent);
             border-radius: 8px;
-            padding: clamp(1.4rem, 3vw, 2.5rem);
-            background:
-                radial-gradient(circle at 18% 10%, rgba(103,232,249,.28), transparent 28%),
-                linear-gradient(135deg, #151b24 0%, #192838 52%, #132322 100%);
-            box-shadow: 0 18px 50px rgba(0,0,0,.32);
-            margin-bottom: 1.2rem;
+            padding: clamp(1.35rem, 3vw, 2.35rem);
+            background: linear-gradient(135deg, #181d22 0%, #15191d 62%, #1d211d 100%);
+            box-shadow: 0 16px 36px rgba(0,0,0,.22);
+            margin-bottom: 1.15rem;
         }
-        .hero h1 { font-size: clamp(2.1rem, 5vw, 4.2rem); margin: 0 0 .35rem; letter-spacing: 0; }
-        .hero p { color: #d8e3ee; max-width: 780px; font-size: 1.05rem; }
-        .hero small { color: var(--cyan); }
-        .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .85rem; margin: 1rem 0; }
+        .hero .kicker {
+            margin: 0 0 .65rem;
+            color: var(--accent);
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .hero h1 { font-size: clamp(2.05rem, 4.4vw, 3.8rem); margin: 0 0 .45rem; letter-spacing: 0; line-height: 1; }
+        .hero p { color: #d9ddd7; max-width: 790px; font-size: 1.04rem; line-height: 1.6; }
+        .hero small { color: var(--muted); }
+        .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
         .metric-card, .rec-card, .road-card, .tool-card {
             border: 1px solid var(--line);
-            background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+            background: linear-gradient(180deg, rgba(245,240,232,.045), rgba(245,240,232,.02));
             border-radius: 8px;
             padding: 1rem;
-            box-shadow: 0 12px 28px rgba(0,0,0,.22);
+            box-shadow: 0 10px 24px rgba(0,0,0,.18);
         }
-        .metric-card span { display: block; color: var(--muted); font-size: .82rem; }
+        .metric-card { border-top-color: var(--line-strong); }
+        .metric-card span { display: block; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
         .metric-card strong { display: block; color: var(--ink); font-size: clamp(1.25rem, 2.5vw, 1.9rem); margin-top: .2rem; overflow-wrap: anywhere; }
         .rec-card { margin-bottom: .9rem; }
         .rec-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
         .rec-card h3 { margin: 0; font-size: 1.35rem; }
-        .rec-card p { color: #ccd6e1; }
-        .score-pill { color:#061014; background: var(--cyan); padding:.35rem .55rem; border-radius:999px; font-weight:800; white-space:nowrap; }
+        .rec-card p { color: #d7ddd7; }
+        .score-pill { color:#17130a; background: var(--accent); padding:.35rem .6rem; border-radius:999px; font-weight:800; white-space:nowrap; }
         .badge, .tag {
             display:inline-flex; align-items:center; margin:.16rem .22rem .16rem 0; padding:.25rem .48rem;
             border:1px solid var(--line); border-radius:999px; font-size:.78rem; line-height:1.2;
-            background:rgba(255,255,255,.06); color:#eef6ff;
+            background:rgba(245,240,232,.06); color:#f2eee7;
         }
-        .badge.best { background: rgba(103,232,249,.16); border-color: rgba(103,232,249,.55); color:#bff7ff; }
-        .tag.green { background:rgba(134,239,172,.14); border-color:rgba(134,239,172,.45); }
-        .tag.blue { background:rgba(147,197,253,.14); border-color:rgba(147,197,253,.45); }
-        .tag.orange { background:rgba(253,186,116,.14); border-color:rgba(253,186,116,.45); }
-        .tag.violet { background:rgba(196,181,253,.14); border-color:rgba(196,181,253,.45); }
+        .badge.best { background: rgba(216,180,106,.16); border-color: rgba(216,180,106,.6); color:#f6d991; }
+        .tag.green { background:rgba(143,184,168,.14); border-color:rgba(143,184,168,.46); }
+        .tag.blue { background:rgba(134,160,184,.16); border-color:rgba(134,160,184,.45); }
+        .tag.orange { background:rgba(211,155,97,.15); border-color:rgba(211,155,97,.48); }
+        .tag.violet { background:rgba(181,160,216,.14); border-color:rgba(181,160,216,.45); }
         .road-grid, .tool-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:.85rem; }
         .road-card h4, .tool-card h4 { margin:.1rem 0 .4rem; }
         .footer { color: var(--muted); border-top:1px solid var(--line); margin-top:2rem; padding-top:1rem; font-size:.9rem; }
         div[data-testid="stTabs"] button { font-size: .95rem; }
+        .stButton > button, .stDownloadButton > button {
+            border-radius: 8px;
+            min-height: 44px;
+            border: 1px solid var(--line);
+            transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        }
+        .stButton > button:hover, .stDownloadButton > button:hover {
+            border-color: var(--line-strong);
+            transform: translateY(-1px);
+        }
+        .stButton > button:focus, .stDownloadButton > button:focus {
+            box-shadow: 0 0 0 2px rgba(216,180,106,.35);
+        }
+        div[data-baseweb="input"], div[data-baseweb="textarea"], div[data-baseweb="select"] {
+            border-radius: 8px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .stButton > button, .stDownloadButton > button { transition: none; }
+            .stButton > button:hover, .stDownloadButton > button:hover { transform: none; }
+        }
         @media (max-width: 900px) {
             .metric-grid, .road-grid, .tool-grid { grid-template-columns: 1fr; }
             .rec-top { display:block; }
@@ -228,8 +258,9 @@ career_df, data_warnings = cached_data()
 st.markdown(
     """
     <section class="hero">
-        <h1>🚀 CareerCompass AI</h1>
-        <p>Discover your best software career path using skill matching, NLP similarity, and explainable scoring.</p>
+        <p class="kicker">Software career path predictor</p>
+        <h1>CareerCompass AI</h1>
+        <p>Compare your skills, interests, and goals against curated software career profiles using transparent scoring and text similarity.</p>
         <small>Built with Python, Streamlit, scikit-learn, Pandas, NumPy, and Plotly. Free and open-source demo project.</small>
     </section>
     """,
@@ -308,9 +339,6 @@ else:
         )
         if top.get("final_score", 0) < 50:
             st.warning("Your profile currently has exploratory matches. Learning a few core skills can improve your fit.")
-        elif top.get("final_score", 0) >= 85 and st.session_state.balloons_key != top.get("career_name"):
-            st.balloons()
-            st.session_state.balloons_key = top.get("career_name")
 
         report = build_report(current_inputs, recs)
         st.download_button("Download Markdown Report", report, "careercompass_report.md", "text/markdown")
