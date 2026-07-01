@@ -258,15 +258,8 @@ with st.sidebar:
         height=130,
     )
     analyze = st.button("Analyze My Career Path", type="primary", use_container_width=True)
-    demo = st.button("Try Demo Profile", use_container_width=True)
-    reset = st.button("Reset", use_container_width=True)
-
-if demo:
-    set_profile(DEMO_PROFILE)
-    st.rerun()
-if reset:
-    set_profile(DEFAULT_PROFILE)
-    st.rerun()
+    st.button("Try Demo Profile", use_container_width=True, on_click=set_profile, args=(DEMO_PROFILE,))
+    st.button("Reset", use_container_width=True, on_click=set_profile, args=(DEFAULT_PROFILE,))
 
 current_inputs = {
     "name": st.session_state.name,
